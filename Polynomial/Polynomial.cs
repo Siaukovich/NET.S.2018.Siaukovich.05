@@ -8,10 +8,16 @@
     /// </summary>
     public class Polynomial
     {
+        #region Private fields
+
         /// <summary>
         /// Polynomial's coefficients.
         /// </summary>
         private readonly double[] coefficients;
+
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polynomial"/> class.
@@ -63,6 +69,10 @@
             }
         }
 
+        #endregion
+
+        #region Object's methods overloads
+
         /// <summary>
         /// Converts polynomial to it's string representation.
         /// </summary>
@@ -86,6 +96,16 @@
             return result.ToString();
         }
 
+        #endregion
+
+        #region ToString private helpers
+
+        /// <summary>
+        /// Appends first term to passed StringBuilder.
+        /// </summary>
+        /// <param name="result">
+        /// StringBuilder to which first term would be appended.
+        /// </param>
         private void FillFirstTerm(StringBuilder result)
         {
             if (this.coefficients[0] == 0)
@@ -104,6 +124,12 @@
             result.Append(firstTerm);
         }
 
+        /// <summary>
+        /// Appends middle terms to passed StringBuilder.
+        /// </summary>
+        /// <param name="result">
+        /// StringBuilder to which middle terms would be appended.
+        /// </param>
         private void FillWithMiddleTerms(StringBuilder result)
         {
             for (int index = 1; index < this.coefficients.Length - 1; index++)
@@ -121,6 +147,16 @@
             }
         }
 
+        /// <summary>
+        /// Gets absolute value of a given term.
+        /// </summary>
+        /// <param name="index">
+        /// Term index.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// Absolute value of a given term as string.
+        /// </returns>
         private string GetAbsoluteTerm(int index)
         {
             if (this.coefficients[index] == 0)
@@ -140,6 +176,12 @@
             return result;
         }
 
+        /// <summary>
+        /// Appends last term to passed StringBuilder.
+        /// </summary>
+        /// <param name="result">
+        /// StringBuilder to which last term would be appended.
+        /// </param>
         private void FillLastTerm(StringBuilder result)
         {
             int lastIndex = this.coefficients.Length - 1;
@@ -150,7 +192,9 @@
             }
 
             string sign = coefficient < 0 ? " - " : " + ";
-           result.Append(sign + coefficient);
+            result.Append(sign + coefficient);
         }
+
+        #endregion
     }
 }
