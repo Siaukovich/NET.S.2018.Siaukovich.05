@@ -72,11 +72,40 @@
         /// </returns>
         public override string ToString()
         {
+            if (this.coefficients.Length == 1)
+            {
+                return this.coefficients[0].ToString();
+            }
+
             var result = new StringBuilder();
 
-            string firstTerm = this.GetFirstTerm();
-            result.Append(firstTerm);
+            this.FillFirstTerm(result);
+            this.FillWithMiddleTerms(result);
+            this.FillLastTerm(result);
 
+            return result.ToString();
+        }
+
+        private void FillFirstTerm(StringBuilder result)
+        {
+            if (this.coefficients[0] == 0)
+            {
+                return;
+            }
+
+            int maxPower = this.coefficients.Length - 1;
+            var firstTerm = $"x^{maxPower}";
+
+            if (this.coefficients[0] != 1)
+            {
+                firstTerm = this.coefficients[0] + firstTerm;
+            }
+
+            result.Append(firstTerm);
+        }
+
+        private void FillWithMiddleTerms(StringBuilder result)
+        {
             for (int index = 1; index < this.coefficients.Length - 1; index++)
             {
                 if (this.coefficients[index] == 0)
@@ -90,29 +119,6 @@
                 result.Append(sign);
                 result.Append(currentAbsoluteTerm);
             }
-
-            string lastTerm = GetLastTerm();
-            result.Append(lastTerm);
-
-            return result.ToString();
-        }
-
-        private string GetFirstTerm()
-        {
-            if (this.coefficients[0] == 0)
-            {
-                return string.Empty;
-            }
-
-            int maxPower = this.coefficients.Length - 1;
-            var result = $"x^{maxPower}";
-
-            if (this.coefficients[0] != 1)
-            {
-                result = this.coefficients[0] + result;
-            }
-
-            return result;
         }
 
         private string GetAbsoluteTerm(int index)
@@ -134,17 +140,17 @@
             return result;
         }
 
-        private string GetLastTerm()
+        private void FillLastTerm(StringBuilder result)
         {
             int lastIndex = this.coefficients.Length - 1;
             double coefficient = this.coefficients[lastIndex];
             if (coefficient == 0)
             {
-                return string.Empty;
+                return;
             }
 
             string sign = coefficient < 0 ? " - " : " + ";
-            return sign + coefficient.ToString();
+           result.Append(sign + coefficient);
         }
     }
 }
