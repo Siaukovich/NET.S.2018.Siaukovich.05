@@ -46,5 +46,89 @@
                 }
             }
         }
+
+        /// <summary>
+        /// Converts polynomial to it's string representation.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// Polynomial's string representation.
+        /// </returns>
+        public override string ToString()
+        {
+            var result = new StringBuilder();
+
+            string firstTerm = this.GetFirstTerm();
+            result.Append(firstTerm);
+
+            for (int index = 1; index < this.coefficients.Length - 1; index++)
+            {
+                if (this.coefficients[index] == 0)
+                {
+                    continue;
+                }
+
+                string currentAbsoluteTerm = this.GetAbsoluteTerm(index);
+
+                string sign = this.coefficients[index] < 0 ? " - " : " + ";
+                result.Append(sign);
+                result.Append(currentAbsoluteTerm);
+            }
+
+            string lastTerm = GetLastTerm();
+            result.Append(lastTerm);
+
+            return result.ToString();
+        }
+
+        private string GetFirstTerm()
+        {
+            if (this.coefficients[0] == 0)
+            {
+                return string.Empty;
+            }
+
+            int maxPower = this.coefficients.Length - 1;
+            var result = $"x^{maxPower}";
+
+            if (this.coefficients[0] != 1)
+            {
+                result = this.coefficients[0] + result;
+            }
+
+            return result;
+        }
+
+        private string GetAbsoluteTerm(int index)
+        {
+            if (this.coefficients[index] == 0)
+            {
+                return string.Empty;
+            }
+
+            int power = this.coefficients.Length - 1 - index;
+
+            var result = power != 1 ? $"x^{power}" : "x";
+
+            if (this.coefficients[index] != 1)
+            {
+                result = Math.Abs(this.coefficients[index]) + result;
+            }
+
+            return result;
+        }
+
+        private string GetLastTerm()
+        {
+            int lastIndex = this.coefficients.Length - 1;
+            double coefficient = this.coefficients[lastIndex];
+            if (coefficient == 0)
+            {
+                return string.Empty;
+            }
+
+            string sign = coefficient < 0 ? " - " : " + ";
+            return sign + coefficient.ToString();
+        }
     }
 }
