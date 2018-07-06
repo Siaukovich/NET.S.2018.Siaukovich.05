@@ -1,5 +1,6 @@
 ﻿namespace Polynomial.Tests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     using NUnit.Framework;
@@ -18,5 +19,17 @@
             var p = new Polynomial(coeffs);
             return p.ToString();
         }
+
+        [Test]
+        public void Constructor_PassedNull_ThrowsArgumentNullException() =>
+            Assert.Throws<ArgumentNullException>(() => new Polynomial(null));
+
+        [Test]
+        public void Constructor_PassedNoValues_ThrowsArgumentException() =>
+            Assert.Throws<ArgumentException>(() => new Polynomial());
+
+        [Test]
+        public void Constructor_PassedAllZeros_ThrowsArgumentException() =>
+            Assert.Throws<ArgumentException>(() => new Polynomial(0, 0, 0, 0));
     }
 }
