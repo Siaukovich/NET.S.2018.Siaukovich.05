@@ -25,13 +25,24 @@
         /// Thrown if argument is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// Thrown if argument has no values.
+        /// Thrown if argument has no values or all value are equal to zero.
         /// </exception>
         public Polynomial(params double[] coefficients)
         {
             ThrowForInvalidParameter();
 
-            this.coefficients = coefficients;
+            int i;
+            for (i = 0; i < coefficients.Length; i++)
+            {
+                if (coefficients[i] != 0)
+                {
+                    break;
+                }
+            }
+
+            int coeffsLength = coefficients.Length - i;
+            this.coefficients = new double[coeffsLength];
+            Array.Copy(coefficients, i, this.coefficients, 0, coeffsLength);
 
             void ThrowForInvalidParameter()
             {
@@ -43,6 +54,11 @@
                 if (coefficients.Length == 0)
                 {
                     throw new ArgumentException($"{nameof(coefficients)} must have at least one element", nameof(coefficients));
+                }
+
+                if (Array.TrueForAll(coefficients, v => v == 0))
+                {
+                    throw new ArgumentException("All coefficients cannot be equal to zero!", nameof(coefficients));
                 }
             }
         }
