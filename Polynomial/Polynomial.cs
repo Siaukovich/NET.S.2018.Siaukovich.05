@@ -10,12 +10,17 @@
     /// </summary>
     public class Polynomial : IEquatable<Polynomial>
     {
-        #region Private static fields
+        #region Private fields
 
         /// <summary>
         /// The comparison epsilon.
         /// </summary>
         private static readonly double COMPARISON_EPSILON = 10e-10;
+
+        /// <summary>
+        /// Polynomial coefficients.
+        /// </summary>
+        private double[] coefficients;
 
         #endregion
 
@@ -49,8 +54,8 @@
             }
 
             int coeffsLength = coefficients.Length - i;
-            this.Coefficients = new double[coeffsLength];
-            Array.Copy(coefficients, i, this.Coefficients, 0, coeffsLength);
+            this.coefficients = new double[coeffsLength];
+            Array.Copy(coefficients, i, this.coefficients, 0, coeffsLength);
 
             void ThrowForInvalidParameter()
             {
@@ -75,10 +80,37 @@
 
         #region Properties
 
+
         /// <summary>
         /// Gets polynomial coefficients.
         /// </summary>
-        public double[] Coefficients { get; }
+        public double[] Coefficients
+        {
+            get
+            {
+                var copy = new double[this.coefficients.Length];
+                for (int i = 0; i < copy.Length; i++)
+                {
+                    copy[i] = this.coefficients[i];
+                }
+
+                return copy;
+            }
+
+            private set => this.coefficients = value;
+        }
+
+        #endregion
+
+        #region Custom public methods
+
+        /// <summary>
+        /// Returns amount of coefficient that this polynomial have.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
+        public int GetAmountOfCoefficients() => this.coefficients.Length;
 
         #endregion
 
@@ -109,7 +141,7 @@
                 return false;
             }
 
-            if (lhs.Coefficients.Length != rhs.Coefficients.Length)
+            if (lhs.GetAmountOfCoefficients() != rhs.GetAmountOfCoefficients())
             {
                 return false;
             }
@@ -157,9 +189,9 @@
         /// </returns>
         public override string ToString()
         {
-            if (this.Coefficients.Length == 1)
+            if (this.coefficients.Length == 1)
             {
-                return this.Coefficients[0].ToString(CultureInfo.CurrentCulture);
+                return this.coefficients[0].ToString(CultureInfo.CurrentCulture);
             }
 
             var result = new StringBuilder();
@@ -195,7 +227,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return this.Coefficients != null ? this.Coefficients.GetHashCode() : 0;
+            return this.coefficients != null ? this.coefficients.GetHashCode() : 0;
         }
 
         #endregion
@@ -249,17 +281,17 @@
         /// </param>
         private void FillFirstTerm(StringBuilder result)
         {
-            if (IsEqualDoubles(this.Coefficients[0], 0d))
+            if (IsEqualDoubles(this.coefficients[0], 0d))
             {
                 return;
             }
 
-            int maxPower = this.Coefficients.Length - 1;
+            int maxPower = this.coefficients.Length - 1;
             var firstTerm = $"x^{maxPower}";
 
-            if (!IsEqualDoubles(this.Coefficients[0], 1))
+            if (!IsEqualDoubles(this.coefficients[0], 1))
             {
-                firstTerm = this.Coefficients[0] + firstTerm;
+                firstTerm = this.coefficients[0] + firstTerm;
             }
 
             result.Append(firstTerm);
@@ -273,16 +305,16 @@
         /// </param>
         private void FillWithMiddleTerms(StringBuilder result)
         {
-            for (int index = 1; index < this.Coefficients.Length - 1; index++)
+            for (int index = 1; index < this.coefficients.Length - 1; index++)
             {
-                if (IsEqualDoubles(this.Coefficients[index], 0))
+                if (IsEqualDoubles(this.coefficients[index], 0))
                 {
                     continue;
                 }
 
                 string currentAbsoluteTerm = this.GetAbsoluteTerm(index);
 
-                string sign = this.Coefficients[index] < 0 ? " - " : " + ";
+                string sign = this.coefficients[index] < 0 ? " - " : " + ";
                 result.Append(sign);
                 result.Append(currentAbsoluteTerm);
             }
@@ -300,18 +332,18 @@
         /// </returns>
         private string GetAbsoluteTerm(int index)
         {
-            if (IsEqualDoubles(this.Coefficients[index], 0))
+            if (IsEqualDoubles(this.coefficients[index], 0))
             {
                 return string.Empty;
             }
 
-            int power = this.Coefficients.Length - 1 - index;
+            int power = this.coefficients.Length - 1 - index;
 
             var result = power != 1 ? $"x^{power}" : "x";
 
-            if (!IsEqualDoubles(this.Coefficients[index], 1))
+            if (!IsEqualDoubles(this.coefficients[index], 1))
             {
-                result = Math.Abs(this.Coefficients[index]) + result;
+                result = Math.Abs(this.coefficients[index]) + result;
             }
 
             return result;
@@ -325,8 +357,8 @@
         /// </param>
         private void FillLastTerm(StringBuilder result)
         {
-            int lastIndex = this.Coefficients.Length - 1;
-            double coefficient = this.Coefficients[lastIndex];
+            int lastIndex = this.coefficients.Length - 1;
+            double coefficient = this.coefficients[lastIndex];
             if (IsEqualDoubles(coefficient, 0))
             {
                 return;
