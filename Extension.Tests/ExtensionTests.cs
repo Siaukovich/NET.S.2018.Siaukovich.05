@@ -5,7 +5,7 @@
     using NUnit.Framework;
 
     /// <summary>
-    /// Test class for Extension class.
+    /// Test class for StringExtension class.
     /// </summary>
     [TestFixture]
     public class ExtensionTests

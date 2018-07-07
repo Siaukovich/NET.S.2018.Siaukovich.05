@@ -91,6 +91,22 @@
             }
         }
 
+        /// <summary>
+        /// Converts number passed as string to decimal base.
+        /// </summary>
+        /// <param name="str">
+        /// Number as string.
+        /// </param>
+        /// <param name="strBase">
+        /// Base of number.
+        /// </param>
+        /// <param name="dict">
+        /// Dict, that contains mapping for base.
+        /// </param>
+        /// <returns>
+        /// The <see cref="uint"/>.
+        /// Converted number.
+        /// </returns>
         private static uint ConvertToDecimal(string str, int strBase, Dictionary<string, int> dict)
         {
             uint answer = 0;
