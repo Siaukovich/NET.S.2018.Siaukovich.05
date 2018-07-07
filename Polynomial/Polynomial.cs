@@ -7,14 +7,14 @@
     /// <summary>
     /// Class for working with mathematical polynomials.
     /// </summary>
-    public class Polynomial
+    public class Polynomial : IEquatable<Polynomial>
     {
         #region Private fields
 
         /// <summary>
         /// Gets polynomial coefficients.
         /// </summary>
-        private double[] Coefficients { get; private set; }
+        public double[] Coefficients { get; private set; }
 
         #endregion
 
@@ -72,6 +72,69 @@
 
         #endregion
 
+        #region Operators overloads
+
+        /// <summary>
+        /// Comparison operator.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// True if both operands are null or if all they coefficients match.
+        /// False otherwise.
+        /// </returns>
+        public static bool operator ==(Polynomial lhs, Polynomial rhs)
+        {
+            if (ReferenceEquals(lhs, rhs))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            {
+                return false;
+            }
+
+            if (lhs.Coefficients.Length != rhs.Coefficients.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < lhs.Coefficients.Length; i++)
+            {
+                if (lhs.Coefficients[i] != rhs.Coefficients[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Comparison operator.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// True if only one of operands is null or not all coefficients are same.
+        /// False otherwise.
+        /// </returns>
+        public static bool operator !=(Polynomial lhs, Polynomial rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        #endregion
+
         #region Object's methods overloads
 
         /// <summary>
@@ -95,6 +158,33 @@
             this.FillLastTerm(result);
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Returns a boolean indicating if 
+        /// the passed in object obj is Equal to this. 
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            return obj != null && obj is Polynomial p && this == p;
+        }
+
+        /// <summary>
+        /// Serves as default hash function.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// Current object's hash code.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return this.Coefficients != null ? this.Coefficients.GetHashCode() : 0;
         }
 
         #endregion
@@ -197,5 +287,21 @@
         }
 
         #endregion
+
+        /// <summary>
+        /// IEquatable's Equals method.
+        /// </summary>
+        /// <param name="other">
+        /// Polynomial with which you want to compare the current.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// True if polynomials are both null or their coefficients are equal.
+        /// False otherwise.
+        /// </returns>
+        public bool Equals(Polynomial other)
+        {
+            return this == other;
+        }
     }
 }
