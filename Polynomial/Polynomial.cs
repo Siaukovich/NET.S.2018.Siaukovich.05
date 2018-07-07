@@ -1,6 +1,7 @@
 ﻿namespace Polynomial
 {
     using System;
+    using System.Linq;
     using System.Text;
 
     /// <summary>
@@ -11,9 +12,9 @@
         #region Private fields
 
         /// <summary>
-        /// Polynomial's coefficients.
+        /// Gets polynomial coefficients.
         /// </summary>
-        private readonly double[] coefficients;
+        private double[] Coefficients { get; private set; }
 
         #endregion
 
@@ -47,8 +48,8 @@
             }
 
             int coeffsLength = coefficients.Length - i;
-            this.coefficients = new double[coeffsLength];
-            Array.Copy(coefficients, i, this.coefficients, 0, coeffsLength);
+            this.Coefficients = new double[coeffsLength];
+            Array.Copy(coefficients, i, this.Coefficients, 0, coeffsLength);
 
             void ThrowForInvalidParameter()
             {
@@ -82,9 +83,9 @@
         /// </returns>
         public override string ToString()
         {
-            if (this.coefficients.Length == 1)
+            if (this.Coefficients.Length == 1)
             {
-                return this.coefficients[0].ToString();
+                return this.Coefficients[0].ToString();
             }
 
             var result = new StringBuilder();
@@ -108,17 +109,17 @@
         /// </param>
         private void FillFirstTerm(StringBuilder result)
         {
-            if (this.coefficients[0] == 0)
+            if (this.Coefficients[0] == 0)
             {
                 return;
             }
 
-            int maxPower = this.coefficients.Length - 1;
+            int maxPower = this.Coefficients.Length - 1;
             var firstTerm = $"x^{maxPower}";
 
-            if (this.coefficients[0] != 1)
+            if (this.Coefficients[0] != 1)
             {
-                firstTerm = this.coefficients[0] + firstTerm;
+                firstTerm = this.Coefficients[0] + firstTerm;
             }
 
             result.Append(firstTerm);
@@ -132,16 +133,16 @@
         /// </param>
         private void FillWithMiddleTerms(StringBuilder result)
         {
-            for (int index = 1; index < this.coefficients.Length - 1; index++)
+            for (int index = 1; index < this.Coefficients.Length - 1; index++)
             {
-                if (this.coefficients[index] == 0)
+                if (this.Coefficients[index] == 0)
                 {
                     continue;
                 }
 
                 string currentAbsoluteTerm = this.GetAbsoluteTerm(index);
 
-                string sign = this.coefficients[index] < 0 ? " - " : " + ";
+                string sign = this.Coefficients[index] < 0 ? " - " : " + ";
                 result.Append(sign);
                 result.Append(currentAbsoluteTerm);
             }
@@ -159,18 +160,18 @@
         /// </returns>
         private string GetAbsoluteTerm(int index)
         {
-            if (this.coefficients[index] == 0)
+            if (this.Coefficients[index] == 0)
             {
                 return string.Empty;
             }
 
-            int power = this.coefficients.Length - 1 - index;
+            int power = this.Coefficients.Length - 1 - index;
 
             var result = power != 1 ? $"x^{power}" : "x";
 
-            if (this.coefficients[index] != 1)
+            if (this.Coefficients[index] != 1)
             {
-                result = Math.Abs(this.coefficients[index]) + result;
+                result = Math.Abs(this.Coefficients[index]) + result;
             }
 
             return result;
@@ -184,8 +185,8 @@
         /// </param>
         private void FillLastTerm(StringBuilder result)
         {
-            int lastIndex = this.coefficients.Length - 1;
-            double coefficient = this.coefficients[lastIndex];
+            int lastIndex = this.Coefficients.Length - 1;
+            double coefficient = this.Coefficients[lastIndex];
             if (coefficient == 0)
             {
                 return;
