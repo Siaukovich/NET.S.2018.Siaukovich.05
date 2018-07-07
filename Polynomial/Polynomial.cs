@@ -1,20 +1,21 @@
 ﻿namespace Polynomial
 {
     using System;
-    using System.Linq;
+    using System.Globalization;
     using System.Text;
 
+    /// <inheritdoc />
     /// <summary>
     /// Class for working with mathematical polynomials.
     /// </summary>
     public class Polynomial : IEquatable<Polynomial>
     {
-        #region Private fields
+        #region Private static fields
 
         /// <summary>
-        /// Gets polynomial coefficients.
+        /// The comparison epsilon.
         /// </summary>
-        public double[] Coefficients { get; }
+        private static readonly double COMPARISON_EPSILON = 10e-10;
 
         #endregion
 
@@ -41,7 +42,7 @@
             int i;
             for (i = 0; i < coefficients.Length; i++)
             {
-                if (coefficients[i] != 0)
+                if (!IsEqualDoubles(coefficients[i], 0d))
                 {
                     break;
                 }
@@ -63,12 +64,21 @@
                     throw new ArgumentException($"{nameof(coefficients)} must have at least one element", nameof(coefficients));
                 }
 
-                if (Array.TrueForAll(coefficients, v => v == 0))
+                if (Array.TrueForAll(coefficients, v => IsEqualDoubles(v, 0d)))
                 {
                     throw new ArgumentException("All coefficients cannot be equal to zero!", nameof(coefficients));
                 }
             }
         }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets polynomial coefficients.
+        /// </summary>
+        public double[] Coefficients { get; }
 
         #endregion
 
@@ -104,9 +114,10 @@
                 return false;
             }
 
+            // Same coefficients.
             for (int i = 0; i < lhs.Coefficients.Length; i++)
             {
-                if (lhs.Coefficients[i] != rhs.Coefficients[i])
+                if (!IsEqualDoubles(lhs.Coefficients[i], rhs.Coefficients[i]))
                 {
                     return false;
                 }
@@ -148,7 +159,7 @@
         {
             if (this.Coefficients.Length == 1)
             {
-                return this.Coefficients[0].ToString();
+                return this.Coefficients[0].ToString(CultureInfo.CurrentCulture);
             }
 
             var result = new StringBuilder();
@@ -162,10 +173,10 @@
 
         /// <summary>
         /// Returns a boolean indicating if 
-        /// the passed in object obj is Equal to this. 
+        /// the passed in object is Equal to this. 
         /// </summary>
         /// <param name="obj">
-        /// The obj.
+        /// Object that will be compared with this.
         /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
@@ -189,6 +200,45 @@
 
         #endregion
 
+        #region IEquatable's implementation
+
+        /// <summary>
+        /// IEquatable's Equals method.
+        /// </summary>
+        /// <param name="other">
+        /// Polynomial with which you want to compare the current.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// True if polynomials are both null or their coefficients are equal.
+        /// False otherwise.
+        /// </returns>
+        public bool Equals(Polynomial other)
+        {
+            return this == other;
+        }
+
+        #endregion
+
+        #region Static private helpers
+
+        /// <summary>
+        /// Checks if two double values are equal with some accuracy.
+        /// </summary>
+        /// <param name="a">
+        /// First double value.
+        /// </param>
+        /// <param name="b">
+        /// Second double value.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// True if a and b are equal, false otherwise.
+        /// </returns>
+        private static bool IsEqualDoubles(double a, double b) => Math.Abs(a - b) < COMPARISON_EPSILON;
+
+        #endregion
+
         #region ToString private helpers
 
         /// <summary>
@@ -199,7 +249,7 @@
         /// </param>
         private void FillFirstTerm(StringBuilder result)
         {
-            if (this.Coefficients[0] == 0)
+            if (IsEqualDoubles(this.Coefficients[0], 0d))
             {
                 return;
             }
@@ -207,7 +257,7 @@
             int maxPower = this.Coefficients.Length - 1;
             var firstTerm = $"x^{maxPower}";
 
-            if (this.Coefficients[0] != 1)
+            if (!IsEqualDoubles(this.Coefficients[0], 1))
             {
                 firstTerm = this.Coefficients[0] + firstTerm;
             }
@@ -225,7 +275,7 @@
         {
             for (int index = 1; index < this.Coefficients.Length - 1; index++)
             {
-                if (this.Coefficients[index] == 0)
+                if (IsEqualDoubles(this.Coefficients[index], 0))
                 {
                     continue;
                 }
@@ -250,7 +300,7 @@
         /// </returns>
         private string GetAbsoluteTerm(int index)
         {
-            if (this.Coefficients[index] == 0)
+            if (IsEqualDoubles(this.Coefficients[index], 0))
             {
                 return string.Empty;
             }
@@ -259,7 +309,7 @@
 
             var result = power != 1 ? $"x^{power}" : "x";
 
-            if (this.Coefficients[index] != 1)
+            if (!IsEqualDoubles(this.Coefficients[index], 1))
             {
                 result = Math.Abs(this.Coefficients[index]) + result;
             }
@@ -277,7 +327,7 @@
         {
             int lastIndex = this.Coefficients.Length - 1;
             double coefficient = this.Coefficients[lastIndex];
-            if (coefficient == 0)
+            if (IsEqualDoubles(coefficient, 0))
             {
                 return;
             }
@@ -287,21 +337,5 @@
         }
 
         #endregion
-
-        /// <summary>
-        /// IEquatable's Equals method.
-        /// </summary>
-        /// <param name="other">
-        /// Polynomial with which you want to compare the current.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// True if polynomials are both null or their coefficients are equal.
-        /// False otherwise.
-        /// </returns>
-        public bool Equals(Polynomial other)
-        {
-            return this == other;
-        }
     }
 }
