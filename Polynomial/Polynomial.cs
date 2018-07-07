@@ -14,7 +14,7 @@
         /// <summary>
         /// Gets polynomial coefficients.
         /// </summary>
-        public double[] Coefficients { get; private set; }
+        public double[] Coefficients { get; }
 
         #endregion
 
