@@ -176,6 +176,53 @@
             return !(lhs == rhs);
         }
 
+        /// <summary>
+        /// Addition operator.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// Polynomial which coefficients are sums of corresponding operand's coefficients.
+        /// </returns>
+        public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
+        {
+            double[] shortestCoeffs;
+            double[] longestCoeffs;
+
+            if (lhs.GetAmountOfCoefficients() < rhs.GetAmountOfCoefficients())
+            {
+                shortestCoeffs = lhs.Coefficients;
+                longestCoeffs = rhs.Coefficients;
+            }
+            else
+            {
+                longestCoeffs = lhs.Coefficients;
+                shortestCoeffs = rhs.Coefficients;
+            }
+
+            double[] newPolynomCoeffs = SumCoefficients();
+
+            return new Polynomial(newPolynomCoeffs);
+
+            double[] SumCoefficients()
+            {
+                int diff = longestCoeffs.Length - shortestCoeffs.Length;
+                newPolynomCoeffs = new double[longestCoeffs.Length];
+                Array.Copy(longestCoeffs, newPolynomCoeffs, diff);
+
+                for (int i = diff; i < newPolynomCoeffs.Length; i++)
+                {
+                    newPolynomCoeffs[i] = shortestCoeffs[i - diff] + longestCoeffs[i];
+                }
+
+                return newPolynomCoeffs;
+            }
+        }
+
         #endregion
 
         #region Object's methods overloads
