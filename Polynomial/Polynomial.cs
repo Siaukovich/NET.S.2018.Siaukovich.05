@@ -334,7 +334,7 @@
             }
 
             int maxPower = this.coefficients.Length - 1;
-            var firstTerm = $"x^{maxPower}";
+            var firstTerm = maxPower > 1 ? $"x^{maxPower}" : "x";
 
             if (!IsEqualDoubles(this.coefficients[0], 1))
             {
@@ -412,7 +412,7 @@
             }
 
             string sign = coefficient < 0 ? " - " : " + ";
-            result.Append(sign + coefficient);
+            result.Append(sign + Math.Abs(coefficient));
         }
 
         #endregion
