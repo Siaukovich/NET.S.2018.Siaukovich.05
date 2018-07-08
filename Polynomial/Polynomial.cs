@@ -328,11 +328,6 @@
         /// </param>
         private void FillFirstTerm(StringBuilder result)
         {
-            if (IsEqualDoubles(this.coefficients[0], 0d))
-            {
-                return;
-            }
-
             int maxPower = this.coefficients.Length - 1;
             var firstTerm = maxPower > 1 ? $"x^{maxPower}" : "x";
 
@@ -379,11 +374,6 @@
         /// </returns>
         private string GetAbsoluteTerm(int index)
         {
-            if (IsEqualDoubles(this.coefficients[index], 0))
-            {
-                return string.Empty;
-            }
-
             int power = this.coefficients.Length - 1 - index;
 
             var result = power != 1 ? $"x^{power}" : "x";
