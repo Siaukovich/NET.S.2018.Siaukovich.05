@@ -55,7 +55,12 @@
 
             int coeffsLength = coefficients.Length - i;
             this.coefficients = new double[coeffsLength];
-            Array.Copy(coefficients, i, this.coefficients, 0, coeffsLength);
+
+            for (int j = 0; j < coeffsLength; j++)
+            {
+                this.coefficients[j] = IsEqualDoubles(coefficients[i], 0d) ? 0 : coefficients[i];
+                i++;
+            }
 
             void ThrowForInvalidParameter()
             {
