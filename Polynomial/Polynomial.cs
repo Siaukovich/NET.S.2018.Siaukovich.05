@@ -38,14 +38,14 @@
         /// Thrown if argument is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// Thrown if argument has no values or all value are equal to zero.
+        /// Thrown if argument has no values.
         /// </exception>
         public Polynomial(params double[] coefficients)
         {
             ThrowForInvalidParameter();
 
             int i;
-            for (i = 0; i < coefficients.Length; i++)
+            for (i = 0; i < coefficients.Length - 1; i++)
             {
                 if (!IsEqualDoubles(coefficients[i], 0d))
                 {
@@ -67,11 +67,6 @@
                 if (coefficients.Length == 0)
                 {
                     throw new ArgumentException($"{nameof(coefficients)} must have at least one element", nameof(coefficients));
-                }
-
-                if (Array.TrueForAll(coefficients, v => IsEqualDoubles(v, 0d)))
-                {
-                    throw new ArgumentException("All coefficients cannot be equal to zero!", nameof(coefficients));
                 }
             }
         }
@@ -99,18 +94,6 @@
 
             private set => this.coefficients = value;
         }
-
-        #endregion
-
-        #region Custom public methods
-
-        /// <summary>
-        /// Returns amount of coefficient that this polynomial have.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="int"/>.
-        /// </returns>
-        public int GetAmountOfCoefficients() => this.coefficients.Length;
 
         #endregion
 
@@ -190,38 +173,153 @@
         /// </returns>
         public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
         {
-            double[] shortestCoeffs;
-            double[] longestCoeffs;
+            bool leftIsShortest = lhs.GetAmountOfCoefficients() < rhs.GetAmountOfCoefficients();
 
-            if (lhs.GetAmountOfCoefficients() < rhs.GetAmountOfCoefficients())
+            double[] shortestCoeffs = leftIsShortest ? lhs.Coefficients : rhs.Coefficients;
+            double[] longestCoeffs = leftIsShortest ? rhs.Coefficients : lhs.Coefficients;
+
+            int diff = longestCoeffs.Length - shortestCoeffs.Length;
+            var newPolynomCoeffs = new double[longestCoeffs.Length];
+            Array.Copy(longestCoeffs, newPolynomCoeffs, diff);
+
+            for (int i = diff; i < newPolynomCoeffs.Length; i++)
             {
-                shortestCoeffs = lhs.Coefficients;
-                longestCoeffs = rhs.Coefficients;
+                newPolynomCoeffs[i] = shortestCoeffs[i - diff] + longestCoeffs[i];
+            }
+
+            return new Polynomial(newPolynomCoeffs);
+        }
+
+        /// <summary>
+        /// Subtraction operator.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// Polynomial which coefficients are differences of corresponding operand's coefficients.
+        /// </returns>
+        public static Polynomial operator -(Polynomial lhs, Polynomial rhs)
+        {
+            bool leftIsShortest = lhs.GetAmountOfCoefficients() < rhs.GetAmountOfCoefficients();
+
+            double[] shortestCoeffs = leftIsShortest ? lhs.Coefficients : rhs.Coefficients;
+            double[] longestCoeffs = leftIsShortest ? rhs.Coefficients : lhs.Coefficients;
+            var newPolynomCoeffs = new double[longestCoeffs.Length];
+            int diff = longestCoeffs.Length - shortestCoeffs.Length;
+
+            if (leftIsShortest)
+            {
+                SubtractShortestFromLongest();
             }
             else
             {
-                longestCoeffs = lhs.Coefficients;
-                shortestCoeffs = rhs.Coefficients;
+                SubtractLongestFromShortest();
             }
-
-            double[] newPolynomCoeffs = SumCoefficients();
 
             return new Polynomial(newPolynomCoeffs);
 
-            double[] SumCoefficients()
+            void SubtractLongestFromShortest()
             {
-                int diff = longestCoeffs.Length - shortestCoeffs.Length;
-                newPolynomCoeffs = new double[longestCoeffs.Length];
-                Array.Copy(longestCoeffs, newPolynomCoeffs, diff);
-
-                for (int i = diff; i < newPolynomCoeffs.Length; i++)
+                int i;
+                for (i = longestCoeffs.Length - 1; i >= diff; i--)
                 {
-                    newPolynomCoeffs[i] = shortestCoeffs[i - diff] + longestCoeffs[i];
+                    newPolynomCoeffs[i] = longestCoeffs[i] - shortestCoeffs[i - diff];
                 }
 
-                return newPolynomCoeffs;
+                while (i >= 0)
+                {
+                    newPolynomCoeffs[i] = longestCoeffs[i];
+                    i--;
+                }
+            }
+
+            void SubtractShortestFromLongest()
+            {
+                int i;
+                for (i = longestCoeffs.Length - 1; i >= diff; i--)
+                {
+                    newPolynomCoeffs[i] = shortestCoeffs[i - diff] - longestCoeffs[i];
+                }
+
+                while (i >= 0)
+                {
+                    newPolynomCoeffs[i] = -longestCoeffs[i];
+                    i--;
+                }
             }
         }
+
+        /// <summary>
+        /// Multiplication of two polynomials.
+        /// </summary>
+        /// <param name="lhs">
+        /// The lhs.
+        /// </param>
+        /// <param name="rhs">
+        /// The rhs.
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
+        {
+            
+        }
+
+        /// <summary>
+        /// Multiplication by number.
+        /// </summary>
+        /// <param name="lhs">
+        /// Polynomial which coefficients will be multiplied.
+        /// </param>
+        /// <param name="rhs">
+        /// Coefficient to which given polynomial will be multiplied.
+        /// </param>
+        /// <returns>
+        /// Multiplied polynomial.
+        /// </returns>
+        public static Polynomial operator *(Polynomial lhs, double rhs)
+        {
+            double[] coeffs = lhs.Coefficients;
+            for (int i = 0; i < coeffs.Length; i++)
+            {
+                coeffs[i] *= rhs;
+            }
+
+            return new Polynomial(coeffs);
+        }
+
+        /// <summary>
+        /// Multiplication by number.
+        /// </summary>
+        /// <param name="lhs">
+        /// Coefficient to which given polynomial will be multiplied.
+        /// </param>
+        /// <param name="rhs">
+        /// Polynomial which coefficients will be multiplied.
+        /// </param>
+        /// <returns>
+        /// Multiplied polynomial.
+        /// </returns>
+        public static Polynomial operator *(double lhs, Polynomial rhs)
+        {
+            return rhs * lhs;
+        }
+
+        #endregion
+
+        #region Custom public methods
+
+        /// <summary>
+        /// Returns amount of coefficient that this polynomial have.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
+        public int GetAmountOfCoefficients() => this.coefficients.Length;
 
         #endregion
 
