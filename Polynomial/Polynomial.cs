@@ -333,6 +333,97 @@
 
         #endregion
 
+        #region CLR-Complant operators methods
+
+        /// <summary>
+        /// Add two polynomials.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Polynomial"/>.
+        /// Polynomial which coefficients are sums of corresponding operand's coefficients.
+        /// </returns>
+        public static Polynomial Add(Polynomial lhs, Polynomial rhs) => lhs + rhs;
+
+        /// <summary>
+        /// Substract two polynomials.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Polynomial"/>.
+        /// Polynomial which coefficients are differences of corresponding operand's coefficients.
+        /// </returns>
+        public static Polynomial Substract(Polynomial lhs, Polynomial rhs) => lhs - rhs;
+
+        /// <summary>
+        /// Multiply two polynomials.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Polynomial"/>.
+        /// Polynomial that is the result of multiplying given polynomials.
+        /// </returns>
+        public static Polynomial Multiply(Polynomial lhs, Polynomial rhs) => lhs * rhs;
+
+        /// <summary>
+        /// Multiply polynomial by some coefficient.
+        /// </summary>
+        /// <param name="lhs">
+        /// Coefficient to which given polynomial will be multiplied.
+        /// </param>
+        /// <param name="rhs">
+        /// Polynomial which coefficients will be multiplied.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Polynomial"/>.
+        /// Multiplied polynomial.
+        /// </returns>
+        public static Polynomial Multiply(double lhs, Polynomial rhs) => lhs * rhs;
+
+        /// <summary>
+        /// Multiply polynomial by some coefficient.
+        /// </summary>
+        /// <param name="lhs">
+        /// Polynomial which coefficients will be multiplied.
+        /// </param>
+        /// <param name="rhs">
+        /// Coefficient to which given polynomial will be multiplied.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Polynomial"/>.
+        /// Multiplied polynomial.
+        /// </returns>
+        public static Polynomial Multiply(Polynomial lhs, double rhs) => lhs * rhs;
+
+        /// <summary>
+        /// Negate polynomial.
+        /// </summary>
+        /// <param name="polynomial">
+        /// The polynomial.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Polynomial"/>.
+        /// Polynomial object with negated coefficients.
+        /// </returns>
+        public static Polynomial Negate(Polynomial polynomial) => -polynomial;
+
+        #endregion
+
         #region Custom public methods
 
         /// <summary>
