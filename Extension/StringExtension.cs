@@ -9,7 +9,7 @@
     public static class StringExtension
     {
         /// <summary>
-        /// Converts given number as string to decimal base.
+        /// Converts given positive number from string representation to decimal base.
         /// </summary>
         /// <param name="str">
         /// Positive number as string.
@@ -33,7 +33,7 @@
         /// <exception cref="ArgumentException">
         /// Thrown if string number contains symbols that are not used in given base.
         /// </exception>
-        public static uint ToDecimalBase(this string str, int strBase)
+        public static int ToDecimalBase(this string str, int strBase)
         {
             var elements = new Dictionary<string, int>
             {
@@ -107,16 +107,16 @@
         /// The <see cref="uint"/>.
         /// Converted number.
         /// </returns>
-        private static uint ConvertToDecimal(string str, int strBase, Dictionary<string, int> dict)
+        private static int ConvertToDecimal(string str, int strBase, Dictionary<string, int> dict)
         {
-            uint answer = 0;
+            int answer = 0;
             int power = str.Length - 1;
             for (int i = 0; i < str.Length; i++)
             {
                 var element = str[i].ToString().ToUpper();
                 checked
                 {
-                    answer += (uint)(dict[element] * Math.Pow(strBase, power));
+                    answer += (int)(dict[element] * Math.Pow(strBase, power));
                 }
 
                 power--;
