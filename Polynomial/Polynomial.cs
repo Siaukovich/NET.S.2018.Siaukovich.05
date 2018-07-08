@@ -221,31 +221,19 @@
 
             void SubtractLongestFromShortest()
             {
-                int i;
-                for (i = longestCoeffs.Length - 1; i >= diff; i--)
+                Array.Copy(longestCoeffs, newPolynomCoeffs, longestCoeffs.Length);
+                for (int i = diff; i < newPolynomCoeffs.Length; i++)
                 {
-                    newPolynomCoeffs[i] = longestCoeffs[i] - shortestCoeffs[i - diff];
-                }
-
-                while (i >= 0)
-                {
-                    newPolynomCoeffs[i] = longestCoeffs[i];
-                    i--;
+                    newPolynomCoeffs[i] -= shortestCoeffs[i - diff];
                 }
             }
 
             void SubtractShortestFromLongest()
             {
-                int i;
-                for (i = longestCoeffs.Length - 1; i >= diff; i--)
+                Array.Copy(shortestCoeffs, 0, newPolynomCoeffs, diff, shortestCoeffs.Length);
+                for (int i = 0; i < newPolynomCoeffs.Length; i++)
                 {
-                    newPolynomCoeffs[i] = shortestCoeffs[i - diff] - longestCoeffs[i];
-                }
-
-                while (i >= 0)
-                {
-                    newPolynomCoeffs[i] = -longestCoeffs[i];
-                    i--;
+                    newPolynomCoeffs[i] -= longestCoeffs[i];
                 }
             }
         }
