@@ -61,7 +61,7 @@
         [TestCase(new[] { 0d, 2, 0 }, 0, new[] { 0d })]
         [TestCase(new[] { 0d, 3 }, -1, new[] { -3d })]
         [TestCase(new[] { -5d, 12, -43 }, 11d , new[] { -55d, 132, -473 })]
-        public void Multiplication_ValidInput_ValidOutput(double[] d, double coeff, double[] result)
+        public void MultiplicationWithCoefficient_ValidInput_ValidOutput(double[] d, double coeff, double[] result)
         {
             var p = new Polynomial(d);
 
@@ -72,6 +72,23 @@
 
             Assert.True(actual_left == expected, $"{actual_left} != {expected}");
             Assert.True(actual_right == expected, $"{actual_right} != {expected}");
+        }
+
+        [TestCase(new[] { 5d, 8, 2 }, new[] { 2d, -1 }, new[] { 10d, 11, -4, -2 })]
+        [TestCase(new[] { 5d, 0, 0, 2 }, new[] { 1d, -5, 4, 0 }, new[] { 5d, -25, 20, 2, -10, 8, 0 })]
+        [TestCase(new[] { 3d, 0, -2 }, new[] { 1d, -2, -8 }, new[] { 3d, -6, -26, 4, 16 })]
+        [TestCase(new[] { 3d, 0, -2 }, new[] { 0d }, new[] { 0d })]
+        [TestCase(new[] { 3d, 0, -2 }, new[] { 1d }, new[] { 3d, 0, -2 })]
+        public void Multiplication_ValidInput_ValidOutput(double[] d1, double[] d2, double[] mul)
+        {
+            var p1 = new Polynomial(d1);
+            var p2 = new Polynomial(d2);
+
+            var expected = new Polynomial(mul);
+
+            Polynomial actual = p1 * p2;
+
+            Assert.True(actual == expected, $"{actual} != {expected}");
         }
 
         [Test]
