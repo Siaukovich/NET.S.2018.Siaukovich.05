@@ -1,6 +1,7 @@
 ﻿namespace Polynomial.Tests
 {
     using System;
+    using System.Linq;
 
     using NUnit.Framework;
 
@@ -89,6 +90,19 @@
             Polynomial actual = p1 * p2;
 
             Assert.True(actual == expected, $"{actual} != {expected}");
+        }
+
+        [TestCase(new[] { 3d, 0, -2 })]
+        [TestCase(new[] { -3d, 0, 2 })]
+        [TestCase(new[] { 0d })]
+        public void Negation_ValidInput_ValidOutput(double[] coeffs)
+        {
+            double[] negatedCoeffs = coeffs.Select(v => -v).ToArray();
+            Polynomial expected = new Polynomial(negatedCoeffs);
+
+            Polynomial actual = -new Polynomial(coeffs);
+
+            Assert.IsTrue(expected == actual, $"{expected} != {actual}");
         }
 
         [Test]

@@ -239,6 +239,26 @@
         }
 
         /// <summary>
+        /// Negation operator.
+        /// </summary>
+        /// <param name="polynomial">
+        /// The polynomial that will be negated.
+        /// </param>
+        /// <returns>
+        /// New Polynomial object with negated coefficients.
+        /// </returns>
+        public static Polynomial operator -(Polynomial polynomial)
+        {
+            double[] newCoeffs = polynomial.Coefficients;
+            for (int i = 0; i < newCoeffs.Length; i++)
+            {
+                newCoeffs[i] *= -1;
+            }
+
+            return new Polynomial(newCoeffs);
+        }
+
+        /// <summary>
         /// Multiplication of two polynomials.
         /// </summary>
         /// <param name="lhs">
