@@ -90,8 +90,6 @@
 
                 return copy;
             }
-
-            private set => this.coefficients = value;
         }
 
         #endregion
