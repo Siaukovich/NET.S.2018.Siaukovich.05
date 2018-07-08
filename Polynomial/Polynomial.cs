@@ -20,7 +20,7 @@
         /// <summary>
         /// Polynomial coefficients.
         /// </summary>
-        private double[] coefficients;
+        private readonly double[] coefficients;
 
         #endregion
 
@@ -74,7 +74,6 @@
         #endregion
 
         #region Properties
-
 
         /// <summary>
         /// Gets polynomial coefficients.
