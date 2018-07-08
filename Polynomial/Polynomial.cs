@@ -242,16 +242,33 @@
         /// Multiplication of two polynomials.
         /// </summary>
         /// <param name="lhs">
-        /// The lhs.
+        /// Left operand.
         /// </param>
         /// <param name="rhs">
-        /// The rhs.
+        /// Right operand.
         /// </param>
         /// <returns>
+        /// Polynomial that is the result of multiplying given polynomials.
         /// </returns>
         public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
         {
-            
+            int resultLength = lhs.GetAmountOfCoefficients() + rhs.GetAmountOfCoefficients() - 1;
+            var resultCoeffs = new double[resultLength];
+            int shift = 0;
+            int leftLength = lhs.GetAmountOfCoefficients();
+            for (int i = rhs.GetAmountOfCoefficients() - 1; i >= 0; i--)
+            {
+                int lastIndex = resultLength - shift;
+                int firstIndex = lastIndex - leftLength;
+                for (int j = firstIndex; j < lastIndex; j++)
+                {
+                    resultCoeffs[j] += lhs.coefficients[j - firstIndex] * rhs.coefficients[i];
+                }
+
+                shift++;
+            }
+
+            return new Polynomial(resultCoeffs);
         }
 
         /// <summary>
