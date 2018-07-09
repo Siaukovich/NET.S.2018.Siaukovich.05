@@ -3,6 +3,7 @@
     using System;
     using System.Globalization;
     using System.Text;
+    using System.Configuration;
 
     /// <inheritdoc />
     /// <summary>
@@ -25,6 +26,19 @@
         #endregion
 
         #region Constructors
+
+        static Polynomial()
+        {
+            try
+            {
+                COMPARISON_EPSILON = double.Parse(ConfigurationManager.AppSettings["Comparison epsilon"]);
+
+            }
+            catch (ConfigurationErrorsException)
+            {
+                COMPARISON_EPSILON = 10e-10; // Default value.
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polynomial"/> class.
@@ -161,8 +175,13 @@
         /// <returns>
         /// Polynomial which coefficients are sums of corresponding operand's coefficients.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if one of operands is null.
+        /// </exception>
         public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
         {
+            ThrowForNullOperands(lhs, rhs);
+
             bool leftIsShortest = lhs.Power < rhs.Power;
 
             double[] shortestCoeffs = leftIsShortest ? lhs.GetCoefficientsCopy() : rhs.GetCoefficientsCopy();
@@ -192,6 +211,9 @@
         /// <returns>
         /// Polynomial which coefficients are differences of corresponding operand's coefficients.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if one of operands is null.
+        /// </exception>
         public static Polynomial operator -(Polynomial lhs, Polynomial rhs) => lhs + (-rhs);
 
         /// <summary>
@@ -203,6 +225,9 @@
         /// <returns>
         /// New Polynomial object with negated coefficients.
         /// </returns>
+        /// /// <exception cref="ArgumentNullException">
+        /// Thrown if one of operands is null.
+        /// </exception>
         public static Polynomial operator -(Polynomial polynomial)
         {
             double[] newCoeffs = polynomial.GetCoefficientsCopy();
@@ -226,9 +251,14 @@
         /// <returns>
         /// Polynomial that is the result of multiplying given polynomials.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if one of operands is null.
+        /// </exception>
         public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
         {
-            int resultLength = lhs.Power + rhs.Power - 3;
+            ThrowForNullOperands(lhs, rhs);
+
+            int resultLength = lhs.Power + rhs.Power + 1;
             var resultCoeffs = new double[resultLength];
             int shift = 0;
             int leftLength = lhs.coefficients.Length;
@@ -238,7 +268,7 @@
                 int firstIndex = lastIndex - leftLength;
                 for (int j = firstIndex; j < lastIndex; j++)
                 {
-                    resultCoeffs[j] += lhs.coefficients[j - firstIndex] * rhs.coefficients[i];
+                    resultCoeffs[j] += lhs[j - firstIndex] * rhs[i];
                 }
 
                 shift++;
@@ -259,8 +289,13 @@
         /// <returns>
         /// Multiplied polynomial.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if polynomial is null.
+        /// </exception>
         public static Polynomial operator *(Polynomial lhs, double rhs)
         {
+            ThrowForNullOperands();
+
             double[] coeffs = lhs.GetCoefficientsCopy();
             for (int i = 0; i < coeffs.Length; i++)
             {
@@ -268,6 +303,14 @@
             }
 
             return new Polynomial(coeffs);
+
+            void ThrowForNullOperands()
+            {
+                if (ReferenceEquals(lhs, null))
+                {
+                    throw new ArgumentNullException(nameof(lhs));
+                }
+            }
         }
 
         /// <summary>
@@ -282,6 +325,9 @@
         /// <returns>
         /// Multiplied polynomial.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if polynomial is null.
+        /// </exception>
         public static Polynomial operator *(double lhs, Polynomial rhs) => rhs * lhs;
 
         #endregion
@@ -542,6 +588,31 @@
         /// True if a and b are equal, false otherwise.
         /// </returns>
         private static bool IsEqualDoubles(double a, double b) => Math.Abs(a - b) < COMPARISON_EPSILON;
+
+        /// <summary>
+        /// Checks parameters and throws for null operand.
+        /// </summary>
+        /// <param name="lhs">
+        /// Left operand.
+        /// </param>
+        /// <param name="rhs">
+        /// Right operand.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if one of operands is null.
+        /// </exception>
+        private static void ThrowForNullOperands(Polynomial lhs, Polynomial rhs)
+        {
+            if (ReferenceEquals(lhs, null))
+            {
+                throw new ArgumentNullException(nameof(lhs));
+            }
+
+            if (ReferenceEquals(rhs, null))
+            {
+                throw new ArgumentNullException(nameof(rhs));
+            }
+        }
 
         #endregion
 
