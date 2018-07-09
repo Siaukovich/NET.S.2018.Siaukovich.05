@@ -8,7 +8,7 @@
     /// <summary>
     /// Class for working with mathematical polynomials.
     /// </summary>
-    public class Polynomial : IEquatable<Polynomial>
+    public sealed class Polynomial : IEquatable<Polynomial>, ICloneable
     {
         #region Private fields
 
@@ -83,20 +83,8 @@
         /// <summary>
         /// Gets polynomial coefficients.
         /// </summary>
-        public double[] Coefficients
-        {
-            get
-            {
-                var copy = new double[this.coefficients.Length];
-                for (int i = 0; i < copy.Length; i++)
-                {
-                    copy[i] = this.coefficients[i];
-                }
-
-                return copy;
-            }
-        }
-
+        public int Power => this.coefficients.Length - 1;    
+        
         #endregion
 
         #region Operators overloads
@@ -126,15 +114,15 @@
                 return false;
             }
 
-            if (lhs.GetAmountOfCoefficients() != rhs.GetAmountOfCoefficients())
+            if (lhs.Power != rhs.Power)
             {
                 return false;
             }
 
             // Same coefficients.
-            for (int i = 0; i < lhs.Coefficients.Length; i++)
+            for (int i = 0; i < lhs.coefficients.Length; i++)
             {
-                if (!IsEqualDoubles(lhs.Coefficients[i], rhs.Coefficients[i]))
+                if (!IsEqualDoubles(lhs[i], rhs[i]))
                 {
                     return false;
                 }
@@ -175,10 +163,10 @@
         /// </returns>
         public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
         {
-            bool leftIsShortest = lhs.GetAmountOfCoefficients() < rhs.GetAmountOfCoefficients();
+            bool leftIsShortest = lhs.Power < rhs.Power;
 
-            double[] shortestCoeffs = leftIsShortest ? lhs.Coefficients : rhs.Coefficients;
-            double[] longestCoeffs = leftIsShortest ? rhs.Coefficients : lhs.Coefficients;
+            double[] shortestCoeffs = leftIsShortest ? lhs.GetCoefficientsCopy() : rhs.GetCoefficientsCopy();
+            double[] longestCoeffs  = leftIsShortest ? rhs.GetCoefficientsCopy() : lhs.GetCoefficientsCopy();
 
             int diff = longestCoeffs.Length - shortestCoeffs.Length;
             var newPolynomCoeffs = new double[longestCoeffs.Length];
@@ -204,44 +192,7 @@
         /// <returns>
         /// Polynomial which coefficients are differences of corresponding operand's coefficients.
         /// </returns>
-        public static Polynomial operator -(Polynomial lhs, Polynomial rhs)
-        {
-            bool leftIsShortest = lhs.GetAmountOfCoefficients() < rhs.GetAmountOfCoefficients();
-
-            double[] shortestCoeffs = leftIsShortest ? lhs.Coefficients : rhs.Coefficients;
-            double[] longestCoeffs = leftIsShortest ? rhs.Coefficients : lhs.Coefficients;
-            var newPolynomCoeffs = new double[longestCoeffs.Length];
-            int diff = longestCoeffs.Length - shortestCoeffs.Length;
-
-            if (leftIsShortest)
-            {
-                SubtractShortestFromLongest();
-            }
-            else
-            {
-                SubtractLongestFromShortest();
-            }
-
-            return new Polynomial(newPolynomCoeffs);
-
-            void SubtractLongestFromShortest()
-            {
-                Array.Copy(longestCoeffs, newPolynomCoeffs, longestCoeffs.Length);
-                for (int i = diff; i < newPolynomCoeffs.Length; i++)
-                {
-                    newPolynomCoeffs[i] -= shortestCoeffs[i - diff];
-                }
-            }
-
-            void SubtractShortestFromLongest()
-            {
-                Array.Copy(shortestCoeffs, 0, newPolynomCoeffs, diff, shortestCoeffs.Length);
-                for (int i = 0; i < newPolynomCoeffs.Length; i++)
-                {
-                    newPolynomCoeffs[i] -= longestCoeffs[i];
-                }
-            }
-        }
+        public static Polynomial operator -(Polynomial lhs, Polynomial rhs) => lhs + (-rhs);
 
         /// <summary>
         /// Negation operator.
@@ -254,7 +205,7 @@
         /// </returns>
         public static Polynomial operator -(Polynomial polynomial)
         {
-            double[] newCoeffs = polynomial.Coefficients;
+            double[] newCoeffs = polynomial.GetCoefficientsCopy();
             for (int i = 0; i < newCoeffs.Length; i++)
             {
                 newCoeffs[i] *= -1;
@@ -277,11 +228,11 @@
         /// </returns>
         public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
         {
-            int resultLength = lhs.GetAmountOfCoefficients() + rhs.GetAmountOfCoefficients() - 1;
+            int resultLength = lhs.Power + rhs.Power - 3;
             var resultCoeffs = new double[resultLength];
             int shift = 0;
-            int leftLength = lhs.GetAmountOfCoefficients();
-            for (int i = rhs.GetAmountOfCoefficients() - 1; i >= 0; i--)
+            int leftLength = lhs.coefficients.Length;
+            for (int i = rhs.coefficients.Length - 1; i >= 0; i--)
             {
                 int lastIndex = resultLength - shift;
                 int firstIndex = lastIndex - leftLength;
@@ -310,7 +261,7 @@
         /// </returns>
         public static Polynomial operator *(Polynomial lhs, double rhs)
         {
-            double[] coeffs = lhs.Coefficients;
+            double[] coeffs = lhs.GetCoefficientsCopy();
             for (int i = 0; i < coeffs.Length; i++)
             {
                 coeffs[i] *= rhs;
@@ -331,10 +282,7 @@
         /// <returns>
         /// Multiplied polynomial.
         /// </returns>
-        public static Polynomial operator *(double lhs, Polynomial rhs)
-        {
-            return rhs * lhs;
-        }
+        public static Polynomial operator *(double lhs, Polynomial rhs) => rhs * lhs;
 
         #endregion
 
@@ -429,15 +377,49 @@
 
         #endregion
 
+        #region Indexer
+
+        public double this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= this.coefficients.Length)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                }
+
+                return this.coefficients[index];
+            }
+
+            private set
+            {
+                if (index < 0 || index >= this.coefficients.Length)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                }
+
+                this.coefficients[index] = value;
+            }
+        }
+
+        #endregion
+
         #region Custom public methods
 
         /// <summary>
-        /// Returns amount of coefficient that this polynomial have.
+        /// Returns array that contains copy of this polynomial coefficients.
         /// </summary>
         /// <returns>
-        /// The <see cref="int"/>.
+        /// The <see cref="double[]"/>.
+        /// Polynomial's coefficients.
         /// </returns>
-        public int GetAmountOfCoefficients() => this.coefficients.Length;
+        public double[] GetCoefficientsCopy()
+        {
+            var copy = new double[this.coefficients.Length];
+            Array.Copy(this.coefficients, copy, this.coefficients.Length);
+
+            return copy;
+        }
 
         #endregion
 
@@ -478,7 +460,14 @@
         /// </returns>
         public override bool Equals(object obj)
         {
-            return obj != null && obj is Polynomial p && this == p;
+            if (obj == null || this.GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var p = (Polynomial)obj;
+
+            return this == p;
         }
 
         /// <summary>
@@ -495,7 +484,7 @@
 
         #endregion
 
-        #region IEquatable's implementation
+        #region IEquatable
 
         /// <summary>
         /// IEquatable's Equals method.
@@ -512,6 +501,28 @@
         {
             return this == other;
         }
+
+        #endregion
+
+        #region ICloneable
+
+        /// <summary>
+        /// Clones this polynomial.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// This polynomial's clone as object.
+        /// </returns>
+        object ICloneable.Clone() => this.Clone();
+
+        /// <summary>
+        /// Clones this polynomial.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// This polynomial's clone.
+        /// </returns>
+        public Polynomial Clone() => new Polynomial(this.coefficients);
 
         #endregion
 
