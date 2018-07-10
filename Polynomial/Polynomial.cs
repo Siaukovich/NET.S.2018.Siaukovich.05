@@ -525,7 +525,18 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return this.coefficients != null ? this.coefficients.GetHashCode() : 0;
+            int hash = 0;
+            unchecked
+            {
+                const int HASH_PRIME_CONST = 2017;
+
+                for (int i = 0; i < this.coefficients.Length; i++)
+                {
+                    hash += (int)this[i] * HASH_PRIME_CONST;
+                }
+            }
+
+            return hash;
         }
 
         #endregion
