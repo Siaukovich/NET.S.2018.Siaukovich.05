@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Security.AccessControl;
 
     /// <summary>
     /// Class that extends string class functionality.
@@ -35,36 +36,12 @@
         /// </exception>
         public static int ToDecimalBase(this string str, int strBase)
         {
-            var elements = new Dictionary<string, int>
-            {
-                { "0", 0 },
-                { "1", 1 },
-                { "2", 2 },
-                { "3", 3 },
-                { "4", 4 },
-                { "5", 5 },
-                { "6", 6 },
-                { "7", 7 },
-                { "8", 8 },
-                { "9", 9 },
-                { "A", 10 },
-                { "B", 11 },
-                { "C", 12 },
-                { "D", 13 },
-                { "E", 14 },
-                { "F", 15 }
-            };
-
             ThrowForInvalidParameters();
 
-            try
-            {
-                return ConvertToDecimal(str, strBase, elements);
-            }
-            catch (OverflowException)
-            {
-                throw new OverflowException("Value can not fit in UInt32 value");
-            }
+            string elements = GetGivenBaseElements(strBase);
+            ThrowForInvalidElementsInStr();
+
+            return ConvertToDecimal(str, strBase, elements);
 
             void ThrowForInvalidParameters()
             {
@@ -78,17 +55,51 @@
                 if (strBase < MIN_BASE || strBase > MAX_BASE)
                 {
                     throw new ArgumentOutOfRangeException(nameof(strBase), $"{strBase} should be in range [{MIN_BASE}, {MAX_BASE}].");
-                }
+                }          
+            }
 
+            void ThrowForInvalidElementsInStr()
+            {
                 foreach (char c in str)
                 {
                     var element = c.ToString().ToUpper();
-                    if (elements.ContainsKey(element) && elements[element] >= strBase)
+                    if (!elements.Contains(element))
                     {
                         throw new ArgumentException($"Element '{c}' is not in base {strBase} system.");
                     }
-                }                
+                }
             }
+        }
+
+        /// <summary>
+        /// Returns string that contains all elements used in passed numeric system.
+        /// </summary>
+        /// <param name="strBase">
+        /// Numeric system base.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// Elements of given base.
+        /// </returns>
+        private static string GetGivenBaseElements(int strBase)
+        {
+            var elements = new char[strBase];
+
+            int i;
+            for (i = 0; i < 10 && i < strBase; i++)
+            {
+                elements[i] = i.ToChar();
+            }
+
+            const int MAX_BASE = 16;
+            while (i < MAX_BASE && i < strBase)
+            {
+                int letterNumber = i - 10;
+                elements[i] = letterNumber.ToCharLetter();
+                i++;
+            }
+
+            return new string(elements);
         }
 
         /// <summary>
@@ -107,22 +118,53 @@
         /// The <see cref="uint"/>.
         /// Converted number.
         /// </returns>
-        private static int ConvertToDecimal(string str, int strBase, Dictionary<string, int> dict)
+        private static int ConvertToDecimal(string str, int strBase, string elements)
         {
             int answer = 0;
-            int power = str.Length - 1;
-            for (int i = 0; i < str.Length; i++)
+            long power = 1;
+            for (int i = str.Length - 1; i >= 0; i--)
             {
                 var element = str[i].ToString().ToUpper();
                 checked
                 {
-                    answer += (int)(dict[element] * Math.Pow(strBase, power));
+                    answer += (int) (elements.IndexOf(element) * power);
+                    power *= strBase;
                 }
-
-                power--;
             }
 
             return answer;
+        }
+
+        /// <summary>
+        /// Converts digit to char.
+        /// </summary>
+        /// <param name="i">
+        /// Digit.
+        /// </param>
+        /// <returns>
+        /// The <see cref="char"/>.
+        /// Passed digit as char.
+        /// </returns>
+        private static char ToChar(this int i)
+        {
+            const int OFFSET = 48;
+            return (char)(i + OFFSET);
+        }
+
+        /// <summary>
+        /// Converts integer to corresponding char letter.
+        /// </summary>
+        /// <param name="i">
+        /// Number of letter in the alphabet.
+        /// </param>
+        /// <returns>
+        /// The <see cref="char"/>.
+        /// Letter.
+        /// </returns>
+        private static char ToCharLetter(this int i)
+        {
+            const int OFFSET = 65;
+            return (char)(i + OFFSET);
         }
     }
 }
